@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Login - SleekMe</title>
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+  <header>
+    <nav>
+      <a href="/" class="logo">SleekMe</a>
+    </nav>
+  </header>
+
+  <main>
+    <div class="contact-form">
+      <h1>Admin Login</h1>
+      <form id="loginForm">
+        <div class="form-group">
+          <label for="username">Username</label>
+          <input type="text" id="username" name="username" required>
+        </div>
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input type="password" id="password" name="password" required>
+        </div>
+        <button type="submit" class="btn">Login</button>
+      </form>
+      <div id="loginResult"></div>
+    </div>
+  </main>
+
+  <footer>
+    <canvas id="waveCanvas"></canvas>
+  </footer>
+
+  <script src="/js/waves.js"></script>
+  <script>
+    document.getElementById('loginForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      const username = document.getElementById('username').value;
+      const password = document.getElementById('password').value;
+      const result = document.getElementById('loginResult');
+      
+      try {
+        const response = await fetch('/.netlify/functions/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username, password })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+          localStorage.setItem('adminAuth', `${username}|${password}`);
+          window.location.href = '/admin.html';
+        } else {
+          result.innerHTML = '<p style="color: red; margin-top: 1rem;">Invalid credentials. Please try again.</p>';
+        }
+      } catch (error) {
+        result.innerHTML = '<p style="color: red; margin-top: 1rem;">Login failed. Please try again.</p>';
+      }
+    });
+  </script>
+</body>
+</html>

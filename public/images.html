@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Images - SleekMe</title>
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+  <header>
+    <nav>
+      <a href="/" class="logo">SleekMe</a>
+      <a href="/blogs.html">Blogs</a>
+      <a href="/videos.html">Videos</a>
+      <a href="/images.html">Images</a>
+      <a href="/about.html">About Me</a>
+      <a href="/contact.html">Contact</a>
+    </nav>
+  </header>
+
+  <main>
+    <h1>Image Gallery</h1>
+    <div id="image-gallery" class="image-gallery loading">Loading images...</div>
+  </main>
+
+  <footer>
+    <canvas id="waveCanvas"></canvas>
+  </footer>
+
+  <script src="/js/waves.js"></script>
+  <script>
+    async function loadImages() {
+      try {
+        const response = await fetch('/.netlify/functions/getImages');
+        const result = await response.json();
+        const container = document.getElementById('image-gallery');
+        
+        if (result.data && result.data.length > 0) {
+          container.innerHTML = '';
+          result.data.forEach(image => {
+            const div = document.createElement('div');
+            div.className = 'image-card';
+            div.innerHTML = `
+              <img src="${image.image_url}" alt="${image.caption}" onclick="openLightbox('${image.image_url}', '${image.caption}')">
+              <div style="padding: 1rem;">
+                <p>${image.caption}</p>
+                <small>Uploaded: ${new Date(image.created_at).toLocaleDateString()}</small>
+              </div>
+            `;
+            container.appendChild(div);
+          });
+        } else {
+          container.innerHTML = '<p>No images found. <a href="/adminlogin.html">Upload your first image!</a></p>';
+        }
+      } catch (error) {
+        console.error('Error loading images:', error);
+        document.getElementById('image-gallery').innerHTML = '<p>Error loading images. Please try again later.</p>';
+      }
+    }
+    
+    function openLightbox(imageUrl, caption) {
+      const lightbox = document.createElement('div');
+      lightbox.style.cssText = `
+        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+        background: rgba(0,0,0,0.9); z-index: 1000; display: flex;
+        align-items: center; justify-content: center; cursor: pointer;
+      `;
+      lightbox.innerHTML = `
+        <div style="max-width: 90%; max-height: 90%; text-align: center;">
+          <img src="${imageUrl}" style="max-width: 100%; max-height: 80vh; object-fit: contain;">
+          <p style="color: white; margin-top: 1rem;">${caption}</p>
+        </div>
+      `;
+      lightbox.onclick = () => document.body.removeChild(lightbox);
+      document.body.appendChild(lightbox);
+    }
+    
+    loadImages();
+  </script>
+</body>
+</html>

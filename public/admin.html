@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard - SleekMe</title>
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+  <header>
+    <nav>
+      <a href="/" class="logo">SleekMe</a>
+      <a href="#" onclick="logout()">Logout</a>
+    </nav>
+  </header>
+
+  <main>
+    <div class="admin-container">
+      <h1>Admin Dashboard</h1>
+      
+      <div class="admin-tabs">
+        <button class="tab-button active" onclick="openTab(event, 'blogs')">Blogs</button>
+        <button class="tab-button" onclick="openTab(event, 'videos')">Videos</button>
+        <button class="tab-button" onclick="openTab(event, 'images')">Images</button>
+      </div>
+
+      <!-- Blogs Tab -->
+      <div id="blogs" class="tab-content active">
+        <div class="admin-form">
+          <h2>Add New Blog</h2>
+          <form id="blogForm">
+            <div class="form-group">
+              <label for="blogTitle">Title</label>
+              <input type="text" id="blogTitle" required>
+            </div>
+            <div class="form-group">
+              <label for="blogContent">Content</label>
+              <textarea id="blogContent" rows="10" required></textarea>
+            </div>
+            <div class="form-group">
+              <label for="blogImage">Image URL</label>
+              <input type="url" id="blogImage">
+            </div>
+            <div class="form-group">
+              <label for="blogVideo">YouTube Video URL</label>
+              <input type="url" id="blogVideo">
+            </div>
+            <button type="submit" class="btn">Add Blog</button>
+          </form>
+        </div>
+      </div>
+
+      <!-- Videos Tab -->
+      <div id="videos" class="tab-content">
+        <div class="admin-form">
+          <h2>Add New Video</h2>
+          <form id="videoForm">
+            <div class="form-group">
+              <label for="videoTitle">Title</label>
+              <input type="text" id="videoTitle" required>
+            </div>
+            <div class="form-group">
+              <label for="videoUrl">YouTube URL</label>
+              <input type="url" id="videoUrl" required>
+            </div>
+            <button type="submit" class="btn">Add Video</button>
+          </form>
+        </div>
+      </div>
+
+      <!-- Images Tab -->
+      <div id="images" class="tab-content">
+        <div class="admin-form">
+          <h2>Add New Image</h2>
+          <form id="imageForm">
+            <div class="form-group">
+              <label for="imageUrl">Image URL</label>
+              <input type="url" id="imageUrl" required>
+            </div>
+            <div class="form-group">
+              <label for="imageCaption">Caption</label>
+              <input type="text" id="imageCaption" required>
+            </div>
+            <button type="submit" class="btn">Add Image</button>
+          </form>
+        </div>
+      </div>
+
+      <div id="adminResult"></div>
+    </div>
+  </main>
+
+  <footer>
+    <canvas id="waveCanvas"></canvas>
+  </footer>
+
+  <script src="/js/waves.js"></script>
+  <script>
+    // Check authentication
+    const adminAuth = localStorage.getItem('adminAuth');
+    if (!adminAuth) {
+      window.location.href = '/adminlogin.html';
+    }
+
+    function openTab(evt, tabName) {
+      const tabContents = document.getElementsByClassName('tab-content');
+      for (let i = 0; i < tabContents.length; i++) {
+        tabContents[i].classList.remove('active');
+      }
+      
+      const tabButtons = document.getElementsByClassName('tab-button');
+      for (let i = 0; i < tabButtons.length; i++) {
+        tabButtons[i].classList.remove('active');
+      }
+      
+      document.getElementById(tabName).classList.add('active');
+      evt.currentTarget.classList.add('active');
+    }
+
+    function logout() {
+      localStorage.removeItem('adminAuth');
+      window.location.href = '/adminlogin.html';
+    }
+
+    // Blog form
+    document.getElementById('blogForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      const data = {
+        title: document.getElementById('blogTitle').value,
+        content: document.getElementById('blogContent').value,
+        imageUrl: document.getElementById('blogImage').value,
+        videoUrl: document.getElementById('blogVideo').value
+      };
+      
+      try {
+        const response = await fetch('/.netlify/functions/addBlog', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-Admin-Auth': adminAuth
+          },
+          body: JSON.stringify(data)
+        });
+        
+        if (response.ok) {
+          document.getElementById('adminResult').innerHTML = '<p style="color: green;">Blog added successfully!</p>';
+          this.reset();
+        } else {
+          throw new Error('Failed to add blog');
+        }
+      } catch (error) {
+        document.getElementById('adminResult').innerHTML = '<p style="color: red;">Error adding blog. Please try again.</p>';
+      }
+    });
+
+    // Video form
+    document.getElementById('videoForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      const data = {
+        title: document.getElementById('videoTitle').value,
+        youtubeUrl: document.getElementById('videoUrl').value
+      };
+      
+      try {
+        const response = await fetch('/.netlify/functions/addVideo', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-Admin-Auth': adminAuth
+          },
+          body: JSON.stringify(data)
+        });
+        
+        if (response.ok) {
+          document.getElementById('adminResult').innerHTML = '<p style="color: green;">Video added successfully!</p>';
+          this.reset();
+        } else {
+          throw new Error('Failed to add video');
+        }
+      } catch (error) {
+        document.getElementById('adminResult').innerHTML = '<p style="color: red;">Error adding video. Please try again.</p>';
+      }
+    });
+
+    // Image form
+    document.getElementById('imageForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      const data = {
+        imageUrl: document.getElementById('imageUrl').value,
+        caption: document.getElementById('imageCaption').value
+      };
+      
+      try {
+        const response = await fetch('/.netlify/functions/addImage', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-Admin-Auth': adminAuth
+          },
+          body: JSON.stringify(data)
+        });
+        
+        if (response.ok) {
+          document.getElementById('adminResult').innerHTML = '<p style="color: green;">Image added successfully!</p>';
+          this.reset();
+        } else {
+          throw new Error('Failed to add image');
+        }
+      } catch (error) {
+        document.getElementById('adminResult').innerHTML = '<p style="color: red;">Error adding image. Please try again.</p>';
+      }
+    });
+  </script>
+</body>
+</html>
