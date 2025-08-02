@@ -1,0 +1,15 @@
+[build]
+  publish = "public"
+  functions = "netlify/functions"
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+[context.production.environment]
+  SUPABASE_URL = "https://your-project.supabase.co"
+  SUPABASE_ANON_KEY = "your-anon-key"
+  SUPABASE_SERVICE_ROLE_KEY = "your-service-role-key"
+  ADMIN_USER = "Admin"
+  ADMIN_PASS = "admin12345"

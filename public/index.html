@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SleekMe - Personal Blog</title>
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+  <header>
+    <nav>
+      <a href="/" class="logo">SleekMe</a>
+      <a href="/blogs.html">Blogs</a>
+      <a href="/videos.html">Videos</a>
+      <a href="/images.html">Images</a>
+      <a href="/about.html">About Me</a>
+      <a href="/contact.html">Contact</a>
+    </nav>
+  </header>
+
+  <main>
+    <div class="hero">
+      <h1>Welcome to SleekMe</h1>
+      <p>A sleek, stylish, and simple personal blog where technology meets storytelling. Join me on my journey of exploration, learning, and growth.</p>
+    </div>
+
+    <section id="latest-content">
+      <h2>Latest Updates</h2>
+      <div id="home-content" class="loading">Loading latest content...</div>
+    </section>
+  </main>
+
+  <footer>
+    <canvas id="waveCanvas"></canvas>
+  </footer>
+
+  <script src="/js/waves.js"></script>
+  <script>
+    // Load latest content for home page
+    async function loadHomeContent() {
+      try {
+        const contentDiv = document.getElementById('home-content');
+        contentDiv.innerHTML = `
+          <div class="blog-grid">
+            <div class="blog-card">
+              <h3>Welcome to SleekMe!</h3>
+              <p>Your personal blog is now live! Start by logging into the admin panel to add your first blog post, videos, and images.</p>
+              <a href="/adminlogin.html" class="btn">Go to Admin</a>
+            </div>
+          </div>
+        `;
+      } catch (error) {
+        console.error('Error loading content:', error);
+        document.getElementById('home-content').innerHTML = '<p>Welcome to SleekMe! Your content will appear here once you start adding blogs, videos, and images.</p>';
+      }
+    }
+    
+    loadHomeContent();
+  </script>
+</body>
+</html>
